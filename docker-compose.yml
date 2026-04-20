@@ -1,0 +1,11 @@
+services:
+  spoon-news:
+    build: .
+    container_name: spoon-news
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      # The curating agent writes news.json into ./data on the host;
+      # the site reads it from /usr/share/nginx/html/data inside the container.
+      - ./data:/usr/share/nginx/html/data:ro

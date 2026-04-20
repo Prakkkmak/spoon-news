@@ -1,0 +1,113 @@
+{
+  "last_update": "2026-04-20T14:30:00",
+  "settings": {
+    "rotation_seconds": 18,
+    "channel_name": "INFO 24",
+    "city": "Brest",
+    "temperature": "14°",
+    "weather_icon": "cloudy"
+  },
+  "markets": [
+    { "label": "CAC 40", "value": "+0,42%", "direction": "up" },
+    { "label": "€/$",    "value": "−0,18%", "direction": "down" },
+    { "label": "BTC",    "value": "+1,8%",  "direction": "up" }
+  ],
+  "ticker": [
+    "Séisme de magnitude 5,8 au large de la Grèce, aucune victime signalée",
+    "Vigilance orange sur huit départements du sud-est",
+    "Bourse de Paris : le CAC 40 ouvre en hausse de 0,42%",
+    "Coupure d'électricité dans le 15e à Paris, 4 000 foyers concernés",
+    "Grève des contrôleurs aériens : 30% des vols annulés vendredi à Orly",
+    "L'euro se stabilise à 1,08 dollar après les annonces de la BCE",
+    "Tour de France 2026 : le parcours officiel dévoilé en direct ce soir"
+  ],
+  "news": [
+    {
+      "category": "POLITIQUE",
+      "location": "PARIS",
+      "time": "IL Y A 12 MIN",
+      "headline": "Budget 2026 : l'Assemblée vote le projet après dix heures de débats",
+      "chapo": "Le texte est adopté malgré une opposition vive sur les mesures fiscales. Le gouvernement évite la motion de censure.",
+      "credit": "© AFP",
+      "illustration": "cityscape",
+      "data_label": "LES CHIFFRES DU VOTE",
+      "data": {
+        "type": "grid",
+        "items": [
+          { "num": "287", "lbl": "Pour" },
+          { "num": "245", "lbl": "Contre" },
+          { "num": "18",  "lbl": "Abstentions" }
+        ]
+      }
+    },
+    {
+      "category": "INTERNATIONAL",
+      "location": "GENÈVE",
+      "time": "IL Y A 38 MIN",
+      "headline": "Climat : 40 pays s'engagent sur la neutralité carbone d'ici 2045",
+      "chapo": "L'accord prévoit un fonds commun de 120 milliards d'euros pour accompagner les pays en développement.",
+      "credit": "© Reuters",
+      "illustration": "globe",
+      "data_label": "DÉCLARATION",
+      "data": {
+        "type": "quote",
+        "text": "Nous ne pouvons plus nous permettre une décennie de discussions. Les actes doivent suivre les engagements.",
+        "cite": "Secrétaire général de l'ONU"
+      }
+    },
+    {
+      "category": "ÉCONOMIE",
+      "location": "FRANCFORT",
+      "time": "IL Y A 1 H",
+      "headline": "La BCE maintient ses taux directeurs face à l'inflation",
+      "chapo": "Christine Lagarde évoque une prudence nécessaire dans un contexte géopolitique tendu.",
+      "credit": "© Reuters",
+      "illustration": "chart",
+      "data_label": "INDICATEURS",
+      "data": {
+        "type": "grid",
+        "items": [
+          { "num": "3,25%", "lbl": "Taux dépôt" },
+          { "num": "2,4%",  "lbl": "Inflation" },
+          { "num": "7 876", "lbl": "CAC 40" }
+        ]
+      }
+    },
+    {
+      "category": "SPORT",
+      "location": "PARIS",
+      "time": "IL Y A 5 MIN",
+      "headline": "PSG – Real Madrid : affiche de rêve en demi-finale de Ligue des champions",
+      "chapo": "Le match aller se jouera au Parc des Princes le 29 avril, le retour au Santiago Bernabéu le 6 mai.",
+      "credit": "© AFP Sport",
+      "illustration": "stadium",
+      "data_label": "AU PROGRAMME",
+      "data": {
+        "type": "bullets",
+        "items": [
+          "Aller — 29 avril, 21h au Parc des Princes",
+          "Retour — 6 mai au Santiago Bernabéu",
+          "Diffusion en clair sur la chaîne"
+        ]
+      }
+    },
+    {
+      "category": "SCIENCE",
+      "location": "BALTIMORE",
+      "time": "IL Y A 2 H",
+      "headline": "James Webb détecte de la vapeur d'eau sur une exoplanète",
+      "chapo": "La découverte concerne K2-18 b, à 124 années-lumière, et relance les spéculations sur la vie extraterrestre.",
+      "credit": "© NASA",
+      "illustration": "planet",
+      "data_label": "LA PLANÈTE K2-18 B",
+      "data": {
+        "type": "grid",
+        "items": [
+          { "num": "124",  "lbl": "A-L de la Terre" },
+          { "num": "8,6×", "lbl": "Masse terrestre" },
+          { "num": "33 j", "lbl": "Durée année" }
+        ]
+      }
+    }
+  ]
+}

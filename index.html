@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>INFO 24 — Direct</title>
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div class="screen" id="screen">
+    <div class="header">
+      <div class="logo-block">
+        <div class="logo" id="logo">INFO 24</div>
+        <div class="live"><div class="live-dot"></div>DIRECT</div>
+      </div>
+      <div class="clock" id="clock">--:--</div>
+    </div>
+
+    <div class="hero" id="hero">
+      <div class="hero-svg" id="hero-svg"></div>
+      <div class="category" id="category">—</div>
+      <div class="credit" id="credit">—</div>
+      <div class="progress" id="progress"></div>
+    </div>
+
+    <div class="content" id="content">
+      <div class="meta" id="meta">—</div>
+      <div class="headline" id="headline">Chargement…</div>
+      <div class="chapo" id="chapo">En attente de données.</div>
+      <div class="divider">
+        <div class="data-label" id="data-label">—</div>
+        <div id="data-block"></div>
+      </div>
+    </div>
+
+    <div class="next">
+      <div class="next-label">À SUIVRE</div>
+      <div class="next-text" id="next-text">—</div>
+    </div>
+
+    <div class="ticker">
+      <div class="urgent">URGENT</div>
+      <div class="ticker-track">
+        <div class="ticker-content" id="ticker"></div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="markets" id="markets"></div>
+      <div class="weather" id="weather">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#c8c8c8" stroke-width="2">
+          <path d="M7 18a5 5 0 1 1 5-9 4 4 0 0 1 7 3 3 3 0 0 1-3 6H7z"/>
+        </svg>
+        <span id="weather-text">—</span>
+      </div>
+    </div>
+
+    <div class="status" id="status" hidden></div>
+  </div>
+
+  <div class="hint" id="hint">
+    → suivant &nbsp;·&nbsp; ← précédent &nbsp;·&nbsp; espace pause &nbsp;·&nbsp; F plein écran &nbsp;·&nbsp; R recharger
+  </div>
+
+  <script src="assets/svgs.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>
