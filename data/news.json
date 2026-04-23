@@ -1,4 +1,5 @@
 {
+  "$schema": "./news.schema.json",
   "last_update": "2026-04-20T14:30:00",
   "settings": {
     "rotation_seconds": 30,
