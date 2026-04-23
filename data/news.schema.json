@@ -1,0 +1,197 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spoon-news/data/news.schema.json",
+  "title": "Spoon News Data",
+  "description": "Structure attendue du fichier data/news.json consommé par l'application Spoon News.",
+  "type": "object",
+  "required": ["news"],
+  "additionalProperties": false,
+  "properties": {
+    "last_update": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Horodatage ISO 8601 de la dernière mise à jour du fichier."
+    },
+    "settings": {
+      "type": "object",
+      "description": "Paramètres globaux d'affichage.",
+      "additionalProperties": false,
+      "properties": {
+        "rotation_seconds": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Durée d'affichage de chaque news avant rotation, en secondes."
+        },
+        "channel_name": {
+          "type": "string",
+          "description": "Nom de la chaîne affiché dans le logo et le titre de la page."
+        },
+        "city": {
+          "type": "string",
+          "description": "Ville affichée dans le bloc météo."
+        },
+        "temperature": {
+          "type": "string",
+          "description": "Température affichée (ex. \"14°\")."
+        },
+        "weather_icon": {
+          "type": "string",
+          "description": "Identifiant de l'icône météo (ex. \"cloudy\", \"sunny\", \"rainy\")."
+        }
+      }
+    },
+    "markets": {
+      "type": "array",
+      "description": "Indicateurs boursiers défilants.",
+      "items": {
+        "type": "object",
+        "required": ["label", "value"],
+        "additionalProperties": false,
+        "properties": {
+          "label": {
+            "type": "string",
+            "description": "Libellé de l'indicateur (ex. \"CAC 40\")."
+          },
+          "value": {
+            "type": "string",
+            "description": "Valeur affichée (ex. \"+0,42%\")."
+          },
+          "direction": {
+            "type": "string",
+            "enum": ["up", "down", "flat"],
+            "description": "Sens de variation ; toute autre valeur est traitée comme \"flat\"."
+          },
+          "since": {
+            "type": "string",
+            "description": "Période de référence (ex. \"depuis l'ouverture\")."
+          }
+        }
+      }
+    },
+    "ticker": {
+      "type": "array",
+      "description": "Bandeau déroulant de brèves.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "news": {
+      "type": "array",
+      "description": "Liste des news affichées en rotation.",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/newsItem" }
+    }
+  },
+  "$defs": {
+    "newsItem": {
+      "type": "object",
+      "required": ["headline"],
+      "additionalProperties": false,
+      "properties": {
+        "category": {
+          "type": "string",
+          "description": "Rubrique en capitales (ex. \"POLITIQUE\", \"SPORT\")."
+        },
+        "location": {
+          "type": "string",
+          "description": "Lieu associé à la news (ex. \"PARIS\")."
+        },
+        "time": {
+          "type": "string",
+          "description": "Indication temporelle relative (ex. \"IL Y A 12 MIN\")."
+        },
+        "headline": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Titre principal de la news."
+        },
+        "chapo": {
+          "type": "string",
+          "description": "Chapô / résumé de la news."
+        },
+        "credit": {
+          "type": "string",
+          "description": "Crédit de la source (ex. \"© AFP\")."
+        },
+        "illustration": {
+          "type": "string",
+          "enum": ["cityscape", "globe", "chart", "stadium", "planet", "generic"],
+          "description": "Clé de l'illustration SVG utilisée dans le hero. Toute valeur inconnue retombe sur \"generic\"."
+        },
+        "data_label": {
+          "type": "string",
+          "description": "Libellé affiché au-dessus du bloc de données."
+        },
+        "data": {
+          "oneOf": [
+            { "$ref": "#/$defs/dataGrid" },
+            { "$ref": "#/$defs/dataQuote" },
+            { "$ref": "#/$defs/dataBullets" }
+          ],
+          "description": "Bloc de données complémentaire affiché sous la news."
+        }
+      }
+    },
+    "dataGrid": {
+      "type": "object",
+      "required": ["type", "items"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "grid" },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["num", "lbl"],
+            "additionalProperties": false,
+            "properties": {
+              "num": {
+                "type": "string",
+                "description": "Valeur chiffrée mise en avant (ex. \"287\", \"3,25%\")."
+              },
+              "lbl": {
+                "type": "string",
+                "description": "Libellé associé à la valeur."
+              }
+            }
+          }
+        }
+      }
+    },
+    "dataQuote": {
+      "type": "object",
+      "required": ["type", "text"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "quote" },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Texte de la citation."
+        },
+        "cite": {
+          "type": "string",
+          "description": "Auteur / source de la citation."
+        }
+      }
+    },
+    "dataBullets": {
+      "type": "object",
+      "required": ["type", "items"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "bullets" },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}
