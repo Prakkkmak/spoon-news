@@ -11,7 +11,7 @@
     markets: [],
     settings: {},
     lastUpdate: null,
-    lastRefresh: null,
+    lastModified: null,
     currentIdx: 0,
     rotationMs: DEFAULT_ROTATION_MS,
     rotationTimer: null,
@@ -207,22 +207,22 @@
     try { localStorage.setItem(THEME_KEY, next); } catch (_) {}
   }
 
-  // ---------- Last refresh ----------
+  // ---------- Last modification ----------
   function renderLastRefresh() {
     const el = $('last-update');
     if (!el) return;
-    if (!state.lastRefresh) {
-      el.textContent = 'Dernière actualisation : —';
+    if (!state.lastModified) {
+      el.textContent = 'Dernière modification le —';
       return;
     }
-    const d = state.lastRefresh;
+    const d = state.lastModified;
     const hh = String(d.getHours()).padStart(2, '0');
     const mm = String(d.getMinutes()).padStart(2, '0');
     const ss = String(d.getSeconds()).padStart(2, '0');
     const dd = String(d.getDate()).padStart(2, '0');
     const mo = String(d.getMonth() + 1).padStart(2, '0');
     const yy = d.getFullYear();
-    el.textContent = `Dernière actualisation : ${dd}/${mo}/${yy} à ${hh}:${mm}:${ss}`;
+    el.textContent = `Dernière modification le ${dd}/${mo}/${yy} à ${hh}:${mm}:${ss}`;
   }
 
   // ---------- Status banner ----------
@@ -242,7 +242,10 @@
       const res = await fetch(url, { cache: 'no-store' });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
-      state.lastRefresh = new Date();
+      if (data.last_update) {
+        const parsed = new Date(data.last_update);
+        if (!isNaN(parsed)) state.lastModified = parsed;
+      }
       renderLastRefresh();
       const stamp = data.last_update || JSON.stringify(data).length;
       if (!force && stamp === state.lastUpdate) {
