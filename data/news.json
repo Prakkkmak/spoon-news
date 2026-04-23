@@ -2,15 +2,15 @@
   "last_update": "2026-04-20T14:30:00",
   "settings": {
     "rotation_seconds": 18,
-    "channel_name": "INFO 24",
+    "channel_name": "SPOON NEWS",
     "city": "Brest",
     "temperature": "14°",
     "weather_icon": "cloudy"
   },
   "markets": [
-    { "label": "CAC 40", "value": "+0,42%", "direction": "up" },
-    { "label": "€/$",    "value": "−0,18%", "direction": "down" },
-    { "label": "BTC",    "value": "+1,8%",  "direction": "up" }
+    { "label": "CAC 40", "value": "+0,42%", "direction": "up",   "since": "depuis l'ouverture" },
+    { "label": "€/$",    "value": "−0,18%", "direction": "down", "since": "sur 24 h" },
+    { "label": "BTC",    "value": "+1,8%",  "direction": "up",   "since": "sur 24 h" }
   ],
   "ticker": [
     "Séisme de magnitude 5,8 au large de la Grèce, aucune victime signalée",

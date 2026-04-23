@@ -3,12 +3,15 @@
   const POLL_MS = 15000;
   const DEFAULT_ROTATION_MS = 18000;
 
+  const THEME_KEY = 'spoon-news:theme';
+
   const state = {
     news: [],
     ticker: [],
     markets: [],
     settings: {},
     lastUpdate: null,
+    lastRefresh: null,
     currentIdx: 0,
     rotationMs: DEFAULT_ROTATION_MS,
     rotationTimer: null,
@@ -106,7 +109,10 @@
       const dir = m.direction === 'up' ? 'up'
                 : m.direction === 'down' ? 'down'
                 : 'flat';
-      return `<span>${escapeHtml(m.label)} <span class="${dir}">${escapeHtml(m.value)}</span></span>`;
+      const since = m.since
+        ? `<span class="since">${escapeHtml(m.since)}</span>`
+        : '';
+      return `<span class="market-item">${escapeHtml(m.label)} <span class="${dir}">${escapeHtml(m.value)}</span>${since}</span>`;
     }).join('');
   }
 
@@ -173,6 +179,52 @@
       `${hh}:${mm}<span style="opacity:0.55">:${ss}</span> · ${days[now.getDay()]} ${now.getDate()} ${months[now.getMonth()]}`;
   }
 
+  // ---------- Theme ----------
+  function applyTheme(theme) {
+    const light = theme === 'light';
+    document.body.classList.toggle('light', light);
+    const btn = $('theme-toggle');
+    if (btn) {
+      btn.setAttribute(
+        'aria-label',
+        light ? 'Passer en mode sombre' : 'Passer en mode clair'
+      );
+      btn.setAttribute(
+        'title',
+        light ? 'Mode sombre' : 'Mode clair'
+      );
+    }
+  }
+  function initTheme() {
+    let saved = null;
+    try { saved = localStorage.getItem(THEME_KEY); } catch (_) {}
+    applyTheme(saved === 'light' ? 'light' : 'dark');
+  }
+  function toggleTheme() {
+    const isLight = document.body.classList.contains('light');
+    const next = isLight ? 'dark' : 'light';
+    applyTheme(next);
+    try { localStorage.setItem(THEME_KEY, next); } catch (_) {}
+  }
+
+  // ---------- Last refresh ----------
+  function renderLastRefresh() {
+    const el = $('last-update');
+    if (!el) return;
+    if (!state.lastRefresh) {
+      el.textContent = 'Dernière actualisation : —';
+      return;
+    }
+    const d = state.lastRefresh;
+    const hh = String(d.getHours()).padStart(2, '0');
+    const mm = String(d.getMinutes()).padStart(2, '0');
+    const ss = String(d.getSeconds()).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mo = String(d.getMonth() + 1).padStart(2, '0');
+    const yy = d.getFullYear();
+    el.textContent = `Dernière actualisation : ${dd}/${mo}/${yy} à ${hh}:${mm}:${ss}`;
+  }
+
   // ---------- Status banner ----------
   function showStatus(msg) {
     const el = $('status');
@@ -190,6 +242,8 @@
       const res = await fetch(url, { cache: 'no-store' });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
+      state.lastRefresh = new Date();
+      renderLastRefresh();
       const stamp = data.last_update || JSON.stringify(data).length;
       if (!force && stamp === state.lastUpdate) {
         clearStatus();
@@ -262,6 +316,10 @@
   }
 
   // ---------- Init ----------
+  initTheme();
+  const themeBtn = $('theme-toggle');
+  if (themeBtn) themeBtn.addEventListener('click', toggleTheme);
+  renderLastRefresh();
   updateClock();
   setInterval(updateClock, 1000);
   loadData({ force: true });
