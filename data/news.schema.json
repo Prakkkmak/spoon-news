@@ -1,0 +1,205 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/prakkkmak/spoon-news/blob/main/data/news.schema.json",
+  "title": "Spoon News data feed",
+  "description": "Structure du fichier data/news.json consommé par l'application Spoon News.",
+  "type": "object",
+  "required": ["last_update", "settings", "markets", "ticker", "news"],
+  "additionalProperties": false,
+  "properties": {
+    "last_update": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Horodatage ISO 8601 de la dernière mise à jour du flux. Sert au diff côté client pour éviter les re-rendus inutiles."
+    },
+    "settings": {
+      "type": "object",
+      "description": "Paramètres globaux d'affichage.",
+      "required": ["rotation_seconds", "channel_name"],
+      "additionalProperties": false,
+      "properties": {
+        "rotation_seconds": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Durée d'affichage de chaque carte d'actualité, en secondes."
+        },
+        "channel_name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Nom de la chaîne, affiché dans le logo et le titre de l'onglet."
+        },
+        "city": {
+          "type": "string",
+          "description": "Ville affichée dans le bloc météo."
+        },
+        "temperature": {
+          "type": "string",
+          "description": "Température formatée affichée à côté de la ville (ex. \"14°\")."
+        },
+        "weather_icon": {
+          "type": "string",
+          "enum": ["sunny", "cloudy", "rainy", "stormy", "snowy", "foggy", "clear-night"],
+          "description": "Identifiant de l'icône météo à afficher."
+        }
+      }
+    },
+    "markets": {
+      "type": "array",
+      "description": "Indicateurs financiers défilant en haut de l'écran.",
+      "items": {
+        "type": "object",
+        "required": ["label", "value", "direction"],
+        "additionalProperties": false,
+        "properties": {
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Nom court de l'indicateur (ex. \"CAC 40\", \"€/$\", \"BTC\")."
+          },
+          "value": {
+            "type": "string",
+            "description": "Variation formatée avec signe (ex. \"+0,42%\", \"−0,18%\")."
+          },
+          "direction": {
+            "type": "string",
+            "enum": ["up", "down", "flat"],
+            "description": "Sens de variation, qui détermine la couleur d'affichage."
+          },
+          "since": {
+            "type": "string",
+            "description": "Période de référence affichée en plus petit (ex. \"depuis l'ouverture\", \"sur 24 h\")."
+          }
+        }
+      }
+    },
+    "ticker": {
+      "type": "array",
+      "description": "Bandeau défilant de brèves textuelles, lu en boucle.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "news": {
+      "type": "array",
+      "description": "Liste des cartes d'actualité affichées en rotation.",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/newsItem" }
+    }
+  },
+  "$defs": {
+    "newsItem": {
+      "type": "object",
+      "required": ["category", "headline", "chapo"],
+      "additionalProperties": false,
+      "properties": {
+        "category": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Rubrique en majuscules (ex. \"POLITIQUE\", \"SPORT\")."
+        },
+        "location": {
+          "type": "string",
+          "description": "Lieu de l'actualité, en majuscules (ex. \"PARIS\", \"GENÈVE\")."
+        },
+        "time": {
+          "type": "string",
+          "description": "Indication temporelle relative pré-formatée (ex. \"IL Y A 12 MIN\")."
+        },
+        "headline": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Titre principal de la carte."
+        },
+        "chapo": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Paragraphe d'introduction qui développe le titre."
+        },
+        "credit": {
+          "type": "string",
+          "description": "Crédit / source affiché en petit (ex. \"© AFP\")."
+        },
+        "illustration": {
+          "type": "string",
+          "enum": ["cityscape", "globe", "chart", "stadium", "planet", "generic"],
+          "description": "Clé de l'illustration SVG à afficher (cf. assets/svgs.js)."
+        },
+        "data_label": {
+          "type": "string",
+          "description": "Titre du bloc de données complémentaire (ex. \"LES CHIFFRES DU VOTE\")."
+        },
+        "data": { "$ref": "#/$defs/dataBlock" }
+      }
+    },
+    "dataBlock": {
+      "description": "Bloc de données complémentaire de la carte. Le champ type détermine la forme.",
+      "oneOf": [
+        { "$ref": "#/$defs/dataGrid" },
+        { "$ref": "#/$defs/dataQuote" },
+        { "$ref": "#/$defs/dataBullets" }
+      ]
+    },
+    "dataGrid": {
+      "type": "object",
+      "required": ["type", "items"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "grid" },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["num", "lbl"],
+            "additionalProperties": false,
+            "properties": {
+              "num": {
+                "type": "string",
+                "description": "Valeur mise en avant (chiffre, pourcentage, durée)."
+              },
+              "lbl": {
+                "type": "string",
+                "description": "Légende courte sous la valeur."
+              }
+            }
+          }
+        }
+      }
+    },
+    "dataQuote": {
+      "type": "object",
+      "required": ["type", "text", "cite"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "quote" },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Texte de la citation, sans guillemets."
+        },
+        "cite": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Auteur ou source de la citation."
+        }
+      }
+    },
+    "dataBullets": {
+      "type": "object",
+      "required": ["type", "items"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "bullets" },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}
