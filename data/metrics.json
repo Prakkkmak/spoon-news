@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-04-29T08:00:00",
+  "weather": {
+    "city": "Brest",
+    "condition": "Nuageux",
+    "emoji": "⛅",
+    "temperature_c": 14,
+    "feels_like_c": 12,
+    "humidity_pct": 78,
+    "wind_kmh": 22,
+    "wind_direction": "NO",
+    "pressure_hpa": 1013,
+    "sunrise": "07:12:00",
+    "sunset": "21:08:00",
+    "tide": {
+      "coefficient": 95,
+      "state": "rising",
+      "progress_pct": 65
+    }
+  },
+  "markets": [
+    { "label": "CAC 40", "value": "+0,42%", "direction": "up",   "since": "depuis l'ouverture" },
+    { "label": "€/$",    "value": "−0,18%", "direction": "down", "since": "sur 24 h" },
+    { "label": "BTC",    "value": "+1,8%",  "direction": "up",   "since": "sur 24 h" }
+  ]
+}

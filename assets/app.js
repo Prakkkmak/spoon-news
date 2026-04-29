@@ -1,22 +1,30 @@
 (() => {
-  const DATA_URL = 'data/news.json';
-  const POLL_MS = 15000;
-  const DEFAULT_ROTATION_MS = 18000;
+  const URLS = {
+    settings: 'data/settings.json',
+    news:     'data/news.json',
+    direct:   'data/direct.json',
+    metrics:  'data/metrics.json'
+  };
+
+  const DEFAULT_POLL_SECONDS = { news: 300, direct: 30, metrics: 30 };
+  const SETTINGS_REFRESH_MS = 5 * 60 * 1000;
+  const DEFAULT_ROTATION_MS = 30000;
 
   const THEME_KEY = 'spoon-news:theme';
 
   const state = {
     news: [],
-    ticker: [],
+    direct: [],
     markets: [],
+    weather: null,
     settings: {},
-    lastUpdate: null,
-    lastModified: null,
+    stamps:  { settings: null, news: null, direct: null, metrics: null },
+    updates: { settings: null, news: null, direct: null, metrics: null },
     currentIdx: 0,
     rotationMs: DEFAULT_ROTATION_MS,
     rotationTimer: null,
     progressTimer: null,
-    pollTimer: null,
+    pollTimers: { settings: null, news: null, direct: null, metrics: null },
     paused: false,
     loaded: false
   };
@@ -27,19 +35,37 @@
     { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
   ));
 
+  // ---------- Time helpers ----------
+  function relativeTime(iso) {
+    const d = new Date(iso);
+    if (isNaN(d)) return '';
+    const diffSec = Math.max(0, Math.floor((Date.now() - d.getTime()) / 1000));
+    if (diffSec < 60) return "À L'INSTANT";
+    const min = Math.floor(diffSec / 60);
+    if (min < 60) return `IL Y A ${min} MIN`;
+    const h = Math.floor(min / 60);
+    if (h < 24) return `IL Y A ${h} H`;
+    const days = Math.floor(h / 24);
+    return `IL Y A ${days} J`;
+  }
+
   // ---------- Render: news card ----------
   function renderNews(idx) {
     if (!state.news.length) {
       $('headline').textContent = 'En attente de données…';
-      $('chapo').textContent = 'Le fichier data/news.json est vide ou inaccessible.';
+      $('chapo').textContent = 'Le flux news est vide ou inaccessible.';
       $('data-block').innerHTML = '';
       $('next-text').textContent = '—';
       return;
     }
     const item = state.news[idx] || state.news[0];
     $('category').textContent = item.category || '';
-    $('credit').textContent = item.credit || '';
-    $('meta').textContent = [item.time, item.location].filter(Boolean).join(' • ');
+    const sources = Array.isArray(item.sources) && item.sources.length
+      ? item.sources.map(s => `© ${s.name}`).join(' · ')
+      : '';
+    $('credit').textContent = sources;
+    const time = item.published_at ? relativeTime(item.published_at) : '';
+    $('meta').textContent = [time, item.location].filter(Boolean).join(' • ');
     $('headline').textContent = item.headline || '';
     $('chapo').textContent = item.chapo || '';
     $('data-label').textContent = item.data_label || '';
@@ -84,21 +110,34 @@
     startProgress();
   }
 
-  // ---------- Render: settings, markets, ticker ----------
+  // ---------- Render: settings ----------
   function applySettings() {
     const s = state.settings || {};
     if (s.channel_name) {
       $('logo').textContent = s.channel_name;
       document.title = s.channel_name + ' — Direct';
     }
-    const city = s.city || '';
-    const temp = s.temperature || '';
-    $('weather-text').textContent = [city, temp].filter(Boolean).join(' ');
     if (Number.isFinite(s.rotation_seconds) && s.rotation_seconds > 0) {
       state.rotationMs = s.rotation_seconds * 1000;
     }
   }
 
+  // ---------- Render: weather (with tide) ----------
+  function renderWeather() {
+    const w = state.weather;
+    if (!w) { $('weather-text').textContent = ''; return; }
+    const main = [w.emoji, w.city, Number.isFinite(w.temperature_c) ? `${w.temperature_c}°` : null]
+      .filter(Boolean).join(' ');
+    let tideStr = '';
+    if (w.tide && Number.isFinite(w.tide.coefficient)) {
+      const arrow = w.tide.state === 'rising' ? '↗' : w.tide.state === 'falling' ? '↘' : '';
+      const pct = Number.isFinite(w.tide.progress_pct) ? ` ${w.tide.progress_pct}%` : '';
+      tideStr = ` · 🌊 ${w.tide.coefficient}${arrow ? ' ' + arrow : ''}${pct}`;
+    }
+    $('weather-text').textContent = main + tideStr;
+  }
+
+  // ---------- Render: markets ----------
   function renderMarkets() {
     const el = $('markets');
     if (!Array.isArray(state.markets) || !state.markets.length) {
@@ -116,14 +155,15 @@
     }).join('');
   }
 
-  function renderTicker() {
+  // ---------- Render: DIRECT ticker ----------
+  function renderDirect() {
     const t = $('ticker');
-    if (!Array.isArray(state.ticker) || !state.ticker.length) {
+    if (!Array.isArray(state.direct) || !state.direct.length) {
       t.innerHTML = '';
       return;
     }
-    const block = state.ticker
-      .map(it => `<span>${escapeHtml(it)}</span><span class="sep"></span>`)
+    const block = state.direct
+      .map(it => `<span>${escapeHtml(it.text)}</span><span class="sep"></span>`)
       .join('');
     t.innerHTML = block + block;
   }
@@ -207,15 +247,20 @@
     try { localStorage.setItem(THEME_KEY, next); } catch (_) {}
   }
 
-  // ---------- Last modification ----------
+  // ---------- Last refresh (most recent updated_at across all 4 feeds) ----------
+  function mostRecentUpdate() {
+    const dates = Object.values(state.updates).filter(Boolean);
+    if (!dates.length) return null;
+    return dates.reduce((a, b) => (a > b ? a : b));
+  }
   function renderLastRefresh() {
     const el = $('last-update');
     if (!el) return;
-    if (!state.lastModified) {
+    const d = mostRecentUpdate();
+    if (!d) {
       el.textContent = 'Dernière modification le —';
       return;
     }
-    const d = state.lastModified;
     const hh = String(d.getHours()).padStart(2, '0');
     const mm = String(d.getMinutes()).padStart(2, '0');
     const ss = String(d.getSeconds()).padStart(2, '0');
@@ -235,58 +280,109 @@
     $('status').hidden = true;
   }
 
-  // ---------- Data loading ----------
-  async function loadData({ force = false } = {}) {
+  // ---------- Generic feed loader ----------
+  // Returns the parsed payload if it changed since the last fetch, otherwise null.
+  async function loadFeed(name) {
+    const url = `${URLS[name]}?t=${Date.now()}`;
+    const res = await fetch(url, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    if (data.updated_at) {
+      const parsed = new Date(data.updated_at);
+      if (!isNaN(parsed)) state.updates[name] = parsed;
+    }
+    if (data.updated_at && data.updated_at === state.stamps[name]) return null;
+    state.stamps[name] = data.updated_at || JSON.stringify(data).length;
+    return data;
+  }
+
+  async function refreshSettings() {
     try {
-      const url = `${DATA_URL}?t=${Date.now()}`;
-      const res = await fetch(url, { cache: 'no-store' });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      if (data.last_update) {
-        const parsed = new Date(data.last_update);
-        if (!isNaN(parsed)) state.lastModified = parsed;
+      const data = await loadFeed('settings');
+      if (data) {
+        state.settings = data;
+        applySettings();
+        schedulePolling();
+        if (state.rotationTimer) startRotation();
       }
+    } catch (e) {
+      console.error('[spoon-news] settings load error', e);
+    } finally {
       renderLastRefresh();
-      const stamp = data.last_update || JSON.stringify(data).length;
-      if (!force && stamp === state.lastUpdate) {
-        clearStatus();
-        return;
-      }
-      state.lastUpdate = stamp;
-      applyData(data);
-      clearStatus();
-    } catch (err) {
-      console.error('[spoon-news] load error:', err);
-      if (!state.loaded) {
-        showStatus('Impossible de charger data/news.json');
-      } else {
-        showStatus('Données obsolètes — reconnexion…');
-      }
     }
   }
 
-  function applyData(data) {
-    const wasPaused = state.paused;
-
-    state.news = Array.isArray(data.news) ? data.news : [];
-    state.ticker = Array.isArray(data.ticker) ? data.ticker : [];
-    state.markets = Array.isArray(data.markets) ? data.markets : [];
-    state.settings = data.settings || {};
-
-    applySettings();
-    renderMarkets();
-    renderTicker();
-
-    if (state.currentIdx >= state.news.length) state.currentIdx = 0;
-    renderNews(state.currentIdx);
-
-    if (!state.loaded) {
-      state.loaded = true;
-      if (!wasPaused) startRotation();
-    } else {
-      // Restart timer with potentially new rotationMs, preserve pause.
-      if (!wasPaused) startRotation();
+  async function refreshNews() {
+    try {
+      const data = await loadFeed('news');
+      if (data) {
+        state.news = Array.isArray(data.news) ? data.news : [];
+        if (state.currentIdx >= state.news.length) state.currentIdx = 0;
+        renderNews(state.currentIdx);
+        if (!state.loaded) {
+          state.loaded = true;
+          if (!state.paused) startRotation();
+        }
+      }
+      clearStatus();
+    } catch (e) {
+      console.error('[spoon-news] news load error', e);
+      if (!state.loaded) showStatus('Impossible de charger data/news.json');
+    } finally {
+      renderLastRefresh();
     }
+  }
+
+  async function refreshDirect() {
+    try {
+      const data = await loadFeed('direct');
+      if (data) {
+        state.direct = Array.isArray(data.items) ? data.items : [];
+        renderDirect();
+      }
+    } catch (e) {
+      console.error('[spoon-news] direct load error', e);
+    } finally {
+      renderLastRefresh();
+    }
+  }
+
+  async function refreshMetrics() {
+    try {
+      const data = await loadFeed('metrics');
+      if (data) {
+        state.weather = data.weather || null;
+        state.markets = Array.isArray(data.markets) ? data.markets : [];
+        renderWeather();
+        renderMarkets();
+      }
+    } catch (e) {
+      console.error('[spoon-news] metrics load error', e);
+    } finally {
+      renderLastRefresh();
+    }
+  }
+
+  // ---------- Polling schedule (driven by settings.poll_seconds) ----------
+  function schedulePolling() {
+    const cfg = (state.settings && state.settings.poll_seconds) || {};
+    const intervals = {
+      news:    Math.max(5, Number(cfg.news)    || DEFAULT_POLL_SECONDS.news),
+      direct:  Math.max(5, Number(cfg.direct)  || DEFAULT_POLL_SECONDS.direct),
+      metrics: Math.max(5, Number(cfg.metrics) || DEFAULT_POLL_SECONDS.metrics)
+    };
+    const fns = { news: refreshNews, direct: refreshDirect, metrics: refreshMetrics };
+    Object.entries(fns).forEach(([name, fn]) => {
+      clearInterval(state.pollTimers[name]);
+      state.pollTimers[name] = setInterval(fn, intervals[name] * 1000);
+    });
+    clearInterval(state.pollTimers.settings);
+    state.pollTimers.settings = setInterval(refreshSettings, SETTINGS_REFRESH_MS);
+  }
+
+  function forceReloadAll() {
+    state.stamps = { settings: null, news: null, direct: null, metrics: null };
+    refreshSettings().then(() => Promise.all([refreshNews(), refreshDirect(), refreshMetrics()]));
   }
 
   // ---------- Keyboard ----------
@@ -305,7 +401,7 @@
       if (document.fullscreenElement) document.exitFullscreen();
       else document.documentElement.requestFullscreen();
     } else if (e.key === 'r' || e.key === 'R') {
-      loadData({ force: true });
+      forceReloadAll();
     }
     showHint();
   });
@@ -325,7 +421,12 @@
   renderLastRefresh();
   updateClock();
   setInterval(updateClock, 1000);
-  loadData({ force: true });
-  state.pollTimer = setInterval(loadData, POLL_MS);
+
+  (async () => {
+    await refreshSettings();
+    await Promise.all([refreshNews(), refreshDirect(), refreshMetrics()]);
+    schedulePolling();
+  })();
+
   setTimeout(() => $('hint').classList.add('hidden'), 5000);
 })();

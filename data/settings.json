@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-04-29T08:00:00",
+  "channel_name": "SPOON NEWS",
+  "rotation_seconds": 30,
+  "poll_seconds": {
+    "news": 300,
+    "direct": 30,
+    "metrics": 30
+  }
+}
