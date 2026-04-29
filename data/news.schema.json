@@ -1,96 +1,33 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/prakkkmak/spoon-news/blob/main/data/news.schema.json",
-  "title": "Spoon News data feed",
-  "description": "Structure du fichier data/news.json consommé par l'application Spoon News.",
+  "title": "Spoon News — news",
+  "description": "Flux des grosses cartes d'actualité éditoriales jouées en rotation.",
   "type": "object",
-  "required": ["last_update", "settings", "markets", "ticker", "news"],
+  "required": ["schema_version", "updated_at", "news"],
   "additionalProperties": false,
   "properties": {
-    "last_update": {
+    "schema_version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Version du schéma de ce fichier."
+    },
+    "updated_at": {
       "type": "string",
       "format": "date-time",
-      "description": "Horodatage ISO 8601 de la dernière mise à jour du flux. Sert au diff côté client pour éviter les re-rendus inutiles."
-    },
-    "settings": {
-      "type": "object",
-      "description": "Paramètres globaux d'affichage.",
-      "required": ["rotation_seconds", "channel_name"],
-      "additionalProperties": false,
-      "properties": {
-        "rotation_seconds": {
-          "type": "integer",
-          "minimum": 1,
-          "description": "Durée d'affichage de chaque carte d'actualité, en secondes."
-        },
-        "channel_name": {
-          "type": "string",
-          "minLength": 1,
-          "description": "Nom de la chaîne, affiché dans le logo et le titre de l'onglet."
-        },
-        "city": {
-          "type": "string",
-          "description": "Ville affichée dans le bloc météo."
-        },
-        "temperature": {
-          "type": "string",
-          "description": "Température formatée affichée à côté de la ville (ex. \"14°\")."
-        },
-        "weather_icon": {
-          "type": "string",
-          "enum": ["sunny", "cloudy", "rainy", "stormy", "snowy", "foggy", "clear-night"],
-          "description": "Identifiant de l'icône météo à afficher."
-        }
-      }
-    },
-    "markets": {
-      "type": "array",
-      "description": "Indicateurs financiers défilant en haut de l'écran.",
-      "items": {
-        "type": "object",
-        "required": ["label", "value", "direction"],
-        "additionalProperties": false,
-        "properties": {
-          "label": {
-            "type": "string",
-            "minLength": 1,
-            "description": "Nom court de l'indicateur (ex. \"CAC 40\", \"€/$\", \"BTC\")."
-          },
-          "value": {
-            "type": "string",
-            "description": "Variation formatée avec signe (ex. \"+0,42%\", \"−0,18%\")."
-          },
-          "direction": {
-            "type": "string",
-            "enum": ["up", "down", "flat"],
-            "description": "Sens de variation, qui détermine la couleur d'affichage."
-          },
-          "since": {
-            "type": "string",
-            "description": "Période de référence affichée en plus petit (ex. \"depuis l'ouverture\", \"sur 24 h\")."
-          }
-        }
-      }
-    },
-    "ticker": {
-      "type": "array",
-      "description": "Bandeau défilant de brèves textuelles, lu en boucle.",
-      "items": {
-        "type": "string",
-        "minLength": 1
-      }
+      "description": "Horodatage ISO 8601 de la dernière modification du fichier."
     },
     "news": {
       "type": "array",
-      "description": "Liste des cartes d'actualité affichées en rotation.",
       "minItems": 1,
+      "description": "Liste des cartes d'actualité éditées.",
       "items": { "$ref": "#/$defs/newsItem" }
     }
   },
   "$defs": {
     "newsItem": {
       "type": "object",
-      "required": ["category", "headline", "chapo"],
+      "required": ["category", "headline", "chapo", "published_at"],
       "additionalProperties": false,
       "properties": {
         "category": {
@@ -102,9 +39,10 @@
           "type": "string",
           "description": "Lieu de l'actualité, en majuscules (ex. \"PARIS\", \"GENÈVE\")."
         },
-        "time": {
+        "published_at": {
           "type": "string",
-          "description": "Indication temporelle relative pré-formatée (ex. \"IL Y A 12 MIN\")."
+          "format": "date-time",
+          "description": "Date/heure ISO 8601 de publication. Le client calcule l'âge (« il y a X min »)."
         },
         "headline": {
           "type": "string",
@@ -116,14 +54,32 @@
           "minLength": 1,
           "description": "Paragraphe d'introduction qui développe le titre."
         },
-        "credit": {
-          "type": "string",
-          "description": "Crédit / source affiché en petit (ex. \"© AFP\")."
+        "sources": {
+          "type": "array",
+          "description": "Sources de l'information (remplace l'ancien champ `credit`).",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["name", "url"],
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Nom court de la source (ex. \"AFP\", \"Reuters\")."
+              },
+              "url": {
+                "type": "string",
+                "format": "uri",
+                "description": "Lien vers l'article ou la dépêche d'origine."
+              }
+            }
+          }
         },
         "illustration": {
           "type": "string",
           "enum": ["cityscape", "globe", "chart", "stadium", "planet", "generic"],
-          "description": "Clé de l'illustration SVG à afficher (cf. assets/svgs.js)."
+          "description": "Clé de l'illustration SVG (cf. assets/svgs.js)."
         },
         "data_label": {
           "type": "string",
@@ -133,7 +89,7 @@
       }
     },
     "dataBlock": {
-      "description": "Bloc de données complémentaire de la carte. Le champ type détermine la forme.",
+      "description": "Bloc de données complémentaire de la carte. Le champ `type` détermine la forme.",
       "oneOf": [
         { "$ref": "#/$defs/dataGrid" },
         { "$ref": "#/$defs/dataQuote" },
@@ -201,5 +157,34 @@
         }
       }
     }
-  }
+  },
+  "examples": [
+    {
+      "schema_version": 1,
+      "updated_at": "2026-04-29T08:00:00",
+      "news": [
+        {
+          "category": "POLITIQUE",
+          "location": "PARIS",
+          "published_at": "2026-04-29T07:48:00",
+          "headline": "Budget 2026 : l'Assemblée vote le projet après dix heures de débats",
+          "chapo": "Le texte est adopté malgré une opposition vive sur les mesures fiscales. Le gouvernement évite la motion de censure.",
+          "sources": [
+            { "name": "AFP", "url": "https://www.afp.com/fr/infos/exemple-budget-2026" },
+            { "name": "Le Monde", "url": "https://www.lemonde.fr/exemple" }
+          ],
+          "illustration": "cityscape",
+          "data_label": "LES CHIFFRES DU VOTE",
+          "data": {
+            "type": "grid",
+            "items": [
+              { "num": "287", "lbl": "Pour" },
+              { "num": "245", "lbl": "Contre" },
+              { "num": "18",  "lbl": "Abstentions" }
+            ]
+          }
+        }
+      ]
+    }
+  ]
 }

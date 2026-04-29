@@ -1,0 +1,181 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/prakkkmak/spoon-news/blob/main/data/metrics.schema.json",
+  "title": "Spoon News — metrics",
+  "description": "Mesures temps réel : météo (avec marée et lever/coucher de soleil) et indicateurs financiers.",
+  "type": "object",
+  "required": ["schema_version", "updated_at", "weather", "markets"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Version du schéma de ce fichier."
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Horodatage ISO 8601 de la dernière modification du fichier."
+    },
+    "weather": { "$ref": "#/$defs/weather" },
+    "markets": {
+      "type": "array",
+      "description": "Indicateurs financiers défilant en haut de l'écran.",
+      "items": { "$ref": "#/$defs/market" }
+    }
+  },
+  "$defs": {
+    "weather": {
+      "type": "object",
+      "required": [
+        "city",
+        "condition",
+        "emoji",
+        "temperature_c",
+        "feels_like_c",
+        "humidity_pct",
+        "wind_kmh",
+        "wind_direction",
+        "sunrise",
+        "sunset",
+        "tide"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "city": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Ville pour laquelle la météo est calculée."
+        },
+        "condition": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Description courte des conditions (ex. \"Nuageux\", \"Pluie faible\")."
+        },
+        "emoji": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Emoji représentant la météo (ex. \"☀️\", \"⛅\", \"🌧️\")."
+        },
+        "temperature_c": {
+          "type": "number",
+          "description": "Température réelle en °C."
+        },
+        "feels_like_c": {
+          "type": "number",
+          "description": "Température ressentie en °C."
+        },
+        "humidity_pct": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Humidité relative en pourcentage."
+        },
+        "wind_kmh": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Vitesse du vent en km/h."
+        },
+        "wind_direction": {
+          "type": "string",
+          "enum": ["N", "NE", "E", "SE", "S", "SO", "O", "NO"],
+          "description": "Direction du vent (rose des vents 8 secteurs)."
+        },
+        "pressure_hpa": {
+          "type": "number",
+          "description": "Pression atmosphérique en hectopascals (optionnel)."
+        },
+        "sunrise": {
+          "type": "string",
+          "format": "time",
+          "description": "Heure locale du lever de soleil (HH:MM:SS)."
+        },
+        "sunset": {
+          "type": "string",
+          "format": "time",
+          "description": "Heure locale du coucher de soleil (HH:MM:SS)."
+        },
+        "tide": { "$ref": "#/$defs/tide" }
+      }
+    },
+    "tide": {
+      "type": "object",
+      "description": "État de la marée — affiché à côté de la météo.",
+      "required": ["coefficient", "state", "progress_pct"],
+      "additionalProperties": false,
+      "properties": {
+        "coefficient": {
+          "type": "integer",
+          "minimum": 20,
+          "maximum": 120,
+          "description": "Coefficient de marée (échelle française 20–120)."
+        },
+        "state": {
+          "type": "string",
+          "enum": ["rising", "falling"],
+          "description": "Sens du cycle : montante ou descendante."
+        },
+        "progress_pct": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Avancement dans le cycle courant (0 = basse mer, 100 = pleine mer)."
+        }
+      }
+    },
+    "market": {
+      "type": "object",
+      "required": ["label", "value", "direction"],
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Nom court de l'indicateur (ex. \"CAC 40\", \"€/$\", \"BTC\")."
+        },
+        "value": {
+          "type": "string",
+          "description": "Variation pré-formatée avec signe (ex. \"+0,42%\", \"−0,18%\")."
+        },
+        "direction": {
+          "type": "string",
+          "enum": ["up", "down", "flat"],
+          "description": "Sens de variation, qui détermine la couleur d'affichage."
+        },
+        "since": {
+          "type": "string",
+          "description": "Période de référence (ex. \"depuis l'ouverture\", \"sur 24 h\")."
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "schema_version": 1,
+      "updated_at": "2026-04-29T08:00:00",
+      "weather": {
+        "city": "Brest",
+        "condition": "Nuageux",
+        "emoji": "⛅",
+        "temperature_c": 14,
+        "feels_like_c": 12,
+        "humidity_pct": 78,
+        "wind_kmh": 22,
+        "wind_direction": "NO",
+        "pressure_hpa": 1013,
+        "sunrise": "07:12:00",
+        "sunset": "21:08:00",
+        "tide": {
+          "coefficient": 95,
+          "state": "rising",
+          "progress_pct": 65
+        }
+      },
+      "markets": [
+        { "label": "CAC 40", "value": "+0,42%", "direction": "up",   "since": "depuis l'ouverture" },
+        { "label": "€/$",    "value": "−0,18%", "direction": "down", "since": "sur 24 h" },
+        { "label": "BTC",    "value": "+1,8%",  "direction": "up",   "since": "sur 24 h" }
+      ]
+    }
+  ]
+}
