@@ -36,8 +36,6 @@
         "humidity_pct",
         "wind_kmh",
         "wind_direction",
-        "sunrise",
-        "sunset",
         "tide"
       ],
       "additionalProperties": false,
@@ -84,16 +82,6 @@
         "pressure_hpa": {
           "type": "number",
           "description": "Pression atmosphérique en hectopascals (optionnel)."
-        },
-        "sunrise": {
-          "type": "string",
-          "format": "time",
-          "description": "Heure locale du lever de soleil (HH:MM:SS)."
-        },
-        "sunset": {
-          "type": "string",
-          "format": "time",
-          "description": "Heure locale du coucher de soleil (HH:MM:SS)."
         },
         "tide": { "$ref": "#/$defs/tide" }
       }
@@ -163,8 +151,6 @@
         "wind_kmh": 22,
         "wind_direction": "NO",
         "pressure_hpa": 1013,
-        "sunrise": "07:12:00",
-        "sunset": "21:08:00",
         "tide": {
           "coefficient": 95,
           "state": "rising",

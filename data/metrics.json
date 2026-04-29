@@ -11,8 +11,6 @@
     "wind_kmh": 22,
     "wind_direction": "NO",
     "pressure_hpa": 1013,
-    "sunrise": "07:12:00",
-    "sunset": "21:08:00",
     "tide": {
       "coefficient": 95,
       "state": "rising",
