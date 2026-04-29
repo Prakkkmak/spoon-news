@@ -1,34 +1,17 @@
 {
-  "last_update": "2026-04-20T14:30:00",
-  "settings": {
-    "rotation_seconds": 30,
-    "channel_name": "SPOON NEWS",
-    "city": "Brest",
-    "temperature": "14°",
-    "weather_icon": "cloudy"
-  },
-  "markets": [
-    { "label": "CAC 40", "value": "+0,42%", "direction": "up",   "since": "depuis l'ouverture" },
-    { "label": "€/$",    "value": "−0,18%", "direction": "down", "since": "sur 24 h" },
-    { "label": "BTC",    "value": "+1,8%",  "direction": "up",   "since": "sur 24 h" }
-  ],
-  "ticker": [
-    "Séisme de magnitude 5,8 au large de la Grèce, aucune victime signalée",
-    "Vigilance orange sur huit départements du sud-est",
-    "Bourse de Paris : le CAC 40 ouvre en hausse de 0,42%",
-    "Coupure d'électricité dans le 15e à Paris, 4 000 foyers concernés",
-    "Grève des contrôleurs aériens : 30% des vols annulés vendredi à Orly",
-    "L'euro se stabilise à 1,08 dollar après les annonces de la BCE",
-    "Tour de France 2026 : le parcours officiel dévoilé en direct ce soir"
-  ],
+  "schema_version": 1,
+  "updated_at": "2026-04-29T08:00:00",
   "news": [
     {
       "category": "POLITIQUE",
       "location": "PARIS",
-      "time": "IL Y A 12 MIN",
+      "published_at": "2026-04-29T07:48:00",
       "headline": "Budget 2026 : l'Assemblée vote le projet après dix heures de débats",
       "chapo": "Le texte est adopté malgré une opposition vive sur les mesures fiscales. Le gouvernement évite la motion de censure.",
-      "credit": "© AFP",
+      "sources": [
+        { "name": "AFP", "url": "https://www.afp.com/" },
+        { "name": "Le Monde", "url": "https://www.lemonde.fr/" }
+      ],
       "illustration": "cityscape",
       "data_label": "LES CHIFFRES DU VOTE",
       "data": {
@@ -43,10 +26,12 @@
     {
       "category": "INTERNATIONAL",
       "location": "GENÈVE",
-      "time": "IL Y A 38 MIN",
+      "published_at": "2026-04-29T07:22:00",
       "headline": "Climat : 40 pays s'engagent sur la neutralité carbone d'ici 2045",
       "chapo": "L'accord prévoit un fonds commun de 120 milliards d'euros pour accompagner les pays en développement.",
-      "credit": "© Reuters",
+      "sources": [
+        { "name": "Reuters", "url": "https://www.reuters.com/" }
+      ],
       "illustration": "globe",
       "data_label": "DÉCLARATION",
       "data": {
@@ -58,10 +43,13 @@
     {
       "category": "ÉCONOMIE",
       "location": "FRANCFORT",
-      "time": "IL Y A 1 H",
+      "published_at": "2026-04-29T07:00:00",
       "headline": "La BCE maintient ses taux directeurs face à l'inflation",
       "chapo": "Christine Lagarde évoque une prudence nécessaire dans un contexte géopolitique tendu.",
-      "credit": "© Reuters",
+      "sources": [
+        { "name": "Reuters", "url": "https://www.reuters.com/" },
+        { "name": "Les Echos", "url": "https://www.lesechos.fr/" }
+      ],
       "illustration": "chart",
       "data_label": "INDICATEURS",
       "data": {
@@ -76,10 +64,12 @@
     {
       "category": "SPORT",
       "location": "PARIS",
-      "time": "IL Y A 5 MIN",
+      "published_at": "2026-04-29T07:55:00",
       "headline": "PSG – Real Madrid : affiche de rêve en demi-finale de Ligue des champions",
       "chapo": "Le match aller se jouera au Parc des Princes le 29 avril, le retour au Santiago Bernabéu le 6 mai.",
-      "credit": "© AFP Sport",
+      "sources": [
+        { "name": "AFP Sport", "url": "https://www.afp.com/" }
+      ],
       "illustration": "stadium",
       "data_label": "AU PROGRAMME",
       "data": {
@@ -94,10 +84,12 @@
     {
       "category": "SCIENCE",
       "location": "BALTIMORE",
-      "time": "IL Y A 2 H",
+      "published_at": "2026-04-29T06:00:00",
       "headline": "James Webb détecte de la vapeur d'eau sur une exoplanète",
       "chapo": "La découverte concerne K2-18 b, à 124 années-lumière, et relance les spéculations sur la vie extraterrestre.",
-      "credit": "© NASA",
+      "sources": [
+        { "name": "NASA", "url": "https://www.nasa.gov/" }
+      ],
       "illustration": "planet",
       "data_label": "LA PLANÈTE K2-18 B",
       "data": {

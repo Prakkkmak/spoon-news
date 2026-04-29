@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/prakkkmak/spoon-news/blob/main/data/settings.schema.json",
+  "title": "Spoon News — settings",
+  "description": "Paramètres globaux de l'application Spoon News (nom de chaîne, rotation, fréquence de polling de chaque flux).",
+  "type": "object",
+  "required": ["schema_version", "updated_at", "channel_name", "rotation_seconds", "poll_seconds"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Version du schéma de ce fichier. À incrémenter à chaque changement structurel rétro-incompatible."
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Horodatage ISO 8601 de la dernière modification de ce fichier."
+    },
+    "channel_name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Nom de la chaîne, affiché dans le logo et le titre de l'onglet."
+    },
+    "rotation_seconds": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Durée d'affichage de chaque carte d'actualité, en secondes."
+    },
+    "poll_seconds": {
+      "type": "object",
+      "description": "Fréquence de re-fetch (en secondes) de chaque flux par le client.",
+      "required": ["news", "direct", "metrics"],
+      "additionalProperties": false,
+      "properties": {
+        "news": {
+          "type": "integer",
+          "minimum": 5,
+          "description": "Polling du flux des grosses news éditoriales."
+        },
+        "direct": {
+          "type": "integer",
+          "minimum": 5,
+          "description": "Polling du bandeau DIRECT."
+        },
+        "metrics": {
+          "type": "integer",
+          "minimum": 5,
+          "description": "Polling météo / marée / bourse."
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "schema_version": 1,
+      "updated_at": "2026-04-29T08:00:00",
+      "channel_name": "SPOON NEWS",
+      "rotation_seconds": 30,
+      "poll_seconds": {
+        "news": 300,
+        "direct": 30,
+        "metrics": 30
+      }
+    }
+  ]
+}

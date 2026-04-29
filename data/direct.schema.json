@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/prakkkmak/spoon-news/blob/main/data/direct.schema.json",
+  "title": "Spoon News — direct",
+  "description": "Bandeau DIRECT défilant en bas de l'écran : flux temps réel de brèves horodatées.",
+  "type": "object",
+  "required": ["schema_version", "updated_at", "items"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Version du schéma de ce fichier."
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Horodatage ISO 8601 de la dernière modification du fichier."
+    },
+    "items": {
+      "type": "array",
+      "description": "Liste des brèves diffusées en boucle dans le bandeau.",
+      "items": {
+        "type": "object",
+        "required": ["text", "published_at"],
+        "additionalProperties": false,
+        "properties": {
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Texte court de la brève (idéalement < 140 caractères)."
+          },
+          "published_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date/heure ISO 8601 de publication de la brève."
+          }
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "schema_version": 1,
+      "updated_at": "2026-04-29T08:00:00",
+      "items": [
+        {
+          "text": "Séisme de magnitude 5,8 au large de la Grèce, aucune victime signalée",
+          "published_at": "2026-04-29T07:32:00"
+        },
+        {
+          "text": "Vigilance orange sur huit départements du sud-est",
+          "published_at": "2026-04-29T07:51:00"
+        },
+        {
+          "text": "Coupure d'électricité dans le 15e à Paris, 4 000 foyers concernés",
+          "published_at": "2026-04-29T07:58:00"
+        }
+      ]
+    }
+  ]
+}
